@@ -1,9 +1,10 @@
 import { Address } from '@ton/core';
 import { TonClient } from '@ton/ton';
 import { CHAIN } from '@tonconnect/ui-react';
-import { START_TIME_OVERHEAD } from './constants';
+import { DEFAULT_DECIMAL_PLACES, START_TIME_OVERHEAD } from './constants';
 import { LinearVestingConfig } from './contracts/LinearVesting';
-import { DurationType, LinearVestingForm } from './types';
+import Big from './lib/big.js';
+import { DurationType, JettonMetadata, LinearVestingForm } from './types';
 
 export const delay = (ms?: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -218,3 +219,21 @@ export async function waitForSeqno(client: TonClient, wallet: Address) {
     throw new Error('Timeout');
   };
 }
+
+const ten = Big(10);
+
+export function toBig(value: bigint | number, decimals = DEFAULT_DECIMAL_PLACES, noFloor = false) {
+  return Big(value.toString())
+    .div(ten.pow(decimals))
+    .round(decimals, noFloor ? Big.roundHalfUp : undefined);
+}
+
+export function toDecimal(value: bigint | number, decimals?: number, noFloor = false) {
+  return toBig(value, decimals ?? DEFAULT_DECIMAL_PLACES, noFloor).toString();
+}
+export const humanizeJettons = (v: bigint, meta?: JettonMetadata) => {
+  const decimals = meta?.decimals ? Number(meta?.decimals) : DEFAULT_DECIMAL_PLACES;
+  console.log({ v, meta, decimals });
+
+  return toDecimal(v, decimals);
+};

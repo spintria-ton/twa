@@ -19,7 +19,7 @@ import {
   Stack,
   Typography,
 } from '@mui/joy';
-import { Address, fromNano } from '@ton/core';
+import { Address } from '@ton/core';
 import { CHAIN, TonConnectButton } from '@tonconnect/ui-react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ru'; // import locale
@@ -27,13 +27,12 @@ import duration from 'dayjs/plugin/duration';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { useTonConnect } from '../hooks/useTonConnect';
 import { SPINTRIA_MASTER_ADDRESS, useWithdrawJetton } from '../hooks/useWithdrawJetton';
+import { humanizeJettons } from '../utils';
 import ColorSchemeToggle from './color-scheme-toggle';
 
 dayjs.locale('ru');
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
-
-const humanizeJettons = (v: BigInt) => Number(fromNano(v.toString())).toLocaleString();
 
 export const VestingWithdraw = () => {
   const { connected, wallet, network } = useTonConnect();
@@ -172,7 +171,12 @@ export const VestingWithdraw = () => {
           Всего получено
         </Typography>
         <Typography level="title-lg" sx={{ fontWeight: 'xl' }}>
-          {queryVesting.data ? humanizeJettons(queryVesting.data?.totalDeposited || 0n) : '...'}
+          {queryVesting.data
+            ? humanizeJettons(
+                queryVesting.data.totalDeposited || 0n,
+                queryJettonMetaData.data?.content,
+              )
+            : '...'}
           &nbsp;&nbsp;
           <Typography color="neutral" level="title-sm">
             {queryJettonMetaData.data && queryJettonMetaData.data.content?.symbol}
@@ -183,7 +187,12 @@ export const VestingWithdraw = () => {
           Всего выведено
         </Typography>
         <Typography level="title-lg" sx={{ fontWeight: 'xl' }}>
-          {queryVesting.data ? humanizeJettons(queryVesting.data?.totalWithdrawals || 0n) : '...'}
+          {queryVesting.data
+            ? humanizeJettons(
+                queryVesting.data.totalWithdrawals || 0n,
+                queryJettonMetaData.data?.content,
+              )
+            : '...'}
           &nbsp;&nbsp;
           <Typography color="neutral" level="title-sm">
             {queryJettonMetaData.data && queryJettonMetaData.data.content?.symbol}
