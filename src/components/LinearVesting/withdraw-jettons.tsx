@@ -12,7 +12,7 @@ dayjs.extend(relativeTime);
 dayjs.extend(duration);
 
 export function WithdrawJettons() {
-  const { connected, wallet } = useTonConnect();
+  const { connected, wallet, isMainnet } = useTonConnect();
   const walletAddress = wallet ? Address.parse(wallet).toString() : undefined;
   const {
     linearVestingAddress,
@@ -37,22 +37,18 @@ export function WithdrawJettons() {
         {/* <ListItem color="neutral">
           Правообладатель:{' '}
           {queryVesting.data && (
-            <TonviewerLink address={queryVesting.data?.ownerAddress.toString()} />
+            <TonviewerLink address={queryVesting.data?.ownerAddress.toString()} testnet={!isMainnet} />
           )}
         </ListItem> */}
         <ListItem color="neutral">
-          Начало вестинга:{' '}
-          {!queryVesting.data ? '' : dayjs(queryVesting.data?.startTime * 1000).fromNow()} (
-          {!queryVesting.data
-            ? '...'
-            : dayjs(queryVesting.data?.startTime * 1000).format('DD/MM/YYYY')}
-          )
+          Начало вестинга: {!queryVesting.data ? '' : dayjs(queryVesting.data?.startTime).fromNow()}{' '}
+          ({!queryVesting.data ? '...' : dayjs(queryVesting.data?.startTime).format('DD/MM/YYYY')})
         </ListItem>
         <ListItem color="neutral">
           Продолжительность:{' '}
           {!queryVesting.data
             ? '...'
-            : dayjs.duration(queryVesting.data?.totalDuration * 220, 'second').humanize()}
+            : dayjs.duration(queryVesting.data?.totalDuration, 'second').humanize()}
         </ListItem>
         <ListItem color="neutral">
           Период блокировки:{' '}
