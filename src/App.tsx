@@ -39,12 +39,13 @@ function App() {
                   vertical: 'top',
                   horizontal: 'left',
                 }}
-                variant="soft"
+                variant="solid"
                 size="sm"
+                showZero={false}
                 slotProps={{
                   badge: { sx: { letterSpacing: -0.6, fontSize: 12 } },
                 }}
-                badgeContent={network ? (network === CHAIN.TESTNET ? 'TESTNET' : '') : 'N/A'}
+                badgeContent={network ? (network === CHAIN.TESTNET ? 'TESTNET' : '') : 0}
               >
                 <TonConnectButton />
               </Badge>
