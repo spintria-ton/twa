@@ -31,7 +31,7 @@ dayjs.locale('ru');
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
 
-const humanizeJettons = (v: BigInt) => Number(fromNano(v)).toLocaleString();
+const humanizeJettons = (v: BigInt) => Number(fromNano(v.toString())).toLocaleString();
 
 export const VestingWithdraw = () => {
   const { connected, wallet, network } = useTonConnect();

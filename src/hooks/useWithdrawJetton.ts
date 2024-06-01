@@ -11,6 +11,9 @@ import { useAsyncInitialize } from './useAsyncInitialize';
 import { useTonClient } from './useTonClient';
 import { useTonConnect } from './useTonConnect';
 
+const SPINTRIA_MASTER_ADDRESS = 'EQACLXDwit01stiqK9FvYiJo15luVzfD5zU8uwDSq6JXxbP8';
+const TOKEN_MASTER_ADDRESS = SPINTRIA_MASTER_ADDRESS;
+
 export function useWithdrawJetton() {
   const { client } = useTonClient();
   const { sender, wallet } = useTonConnect();
@@ -21,7 +24,7 @@ export function useWithdrawJetton() {
 
   const jettonMasterContract = useAsyncInitialize(async () => {
     if (!client || !wallet) return;
-    const jettonAdress = getAddress('EQCTPHfgOVEF1Bpv_e79x4HlJ7oEcfxMcOdXLcwaAP3cAqit');
+    const jettonAdress = getAddress(TOKEN_MASTER_ADDRESS);
     if (!jettonAdress) return;
     const contract = new Jetton(jettonAdress);
     return client.open(contract) as OpenedContract<Jetton>;
