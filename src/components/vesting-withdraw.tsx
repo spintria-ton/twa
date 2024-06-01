@@ -180,7 +180,7 @@ export const VestingWithdraw = () => {
         </Typography>
         {!connected && (
           <Alert sx={{ mt: 2 }} color="danger">
-            Подключите кошелек для работы с кошельком
+            Подключите кошелек для работы с контрактом
           </Alert>
         )}
       </CardContent>
