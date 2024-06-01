@@ -30,7 +30,7 @@ function App() {
             px={1}
           >
             <Stack direction="row" alignItems="center" spacing={2}>
-              <Avatar src="/icon.jpeg" sx={{ '--Avatar-size': '3rem' }} />
+              <Avatar src="/twa/icon.jpeg" sx={{ '--Avatar-size': '3rem' }} />
               <Typography>Spintria (SP) Вестинг</Typography>
             </Stack>
             <Stack direction="row" alignItems="center" spacing={1}>
