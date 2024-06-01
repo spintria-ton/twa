@@ -34,6 +34,7 @@ function App() {
               <Typography>Spintria (SP) Вестинг</Typography>
             </Stack>
             <Stack direction="row" alignItems="center" spacing={1}>
+              <ColorSchemeToggle />
               <Badge
                 anchorOrigin={{
                   vertical: 'top',
@@ -49,7 +50,6 @@ function App() {
               >
                 <TonConnectButton />
               </Badge>
-              <ColorSchemeToggle />
             </Stack>
           </Stack>
           <LinearVesting />
