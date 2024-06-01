@@ -194,6 +194,11 @@ export const VestingWithdraw = () => {
             Подключите кошелек для работы с контрактом
           </Alert>
         )}
+        {queryVesting.data && walletAddress !== queryVesting.data.ownerAddress.toString() && (
+          <Alert color="danger" sx={{ mt: 1, py: 1 }}>
+            Вы не можете вывести жетоны на свой кошелек так как не являетесь правообладателем
+          </Alert>
+        )}
       </CardContent>
       <CardOverflow sx={{ bgcolor: 'background.level1' }}>
         <CardActions buttonFlex="1">

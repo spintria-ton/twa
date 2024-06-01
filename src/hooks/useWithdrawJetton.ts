@@ -88,6 +88,9 @@ export function useWithdrawJetton() {
         await waiter();
       } catch (error) {}
 
+      // await delay(20 * 1000);
+      // window.location.reload();
+
       setSending(false);
     },
   };
