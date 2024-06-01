@@ -1,3 +1,4 @@
+import { OpenInNew } from '@mui/icons-material';
 import {
   Alert,
   Avatar,
@@ -13,6 +14,7 @@ import {
   FormControl,
   FormHelperText,
   FormLabel,
+  IconButton,
   Input,
   Stack,
   Typography,
@@ -24,7 +26,7 @@ import 'dayjs/locale/ru'; // import locale
 import duration from 'dayjs/plugin/duration';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { useTonConnect } from '../hooks/useTonConnect';
-import { useWithdrawJetton } from '../hooks/useWithdrawJetton';
+import { SPINTRIA_MASTER_ADDRESS, useWithdrawJetton } from '../hooks/useWithdrawJetton';
 import ColorSchemeToggle from './color-scheme-toggle';
 
 dayjs.locale('ru');
@@ -105,7 +107,17 @@ export const VestingWithdraw = () => {
               onChange={(e) => setWithdrawVestingAddress(e.target.value)}
             />
             <FormHelperText sx={{ color: (t) => t.vars.palette.danger.plainColor }}>
-              Не переводите на этот адрес тоны или жетоны
+              Не переводите на этот адрес тоны или жетоны, кроме SP{' '}
+              <IconButton
+                onClick={() =>
+                  window.open(`https://tonviewer.com/${SPINTRIA_MASTER_ADDRESS}`, '_blank')
+                }
+                size="sm"
+                color="primary"
+                sx={{ '--IconButton-size': '24px' }}
+              >
+                <OpenInNew />
+              </IconButton>
             </FormHelperText>
           </FormControl>
         </Box>
