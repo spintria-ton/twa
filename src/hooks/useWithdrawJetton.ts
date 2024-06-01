@@ -1,8 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
-import { Address, OpenedContract, beginCell, toNano } from '@ton/core';
+import { Address, OpenedContract, beginCell, fromNano, toNano } from '@ton/core';
 import { useState } from 'react';
 import { useRecoilState } from 'recoil';
+import Jetton from '../contracts/Jetton';
 import { LinearVesting, Opcodes } from '../contracts/LinearVesting';
+import { getJettonMetadata } from '../metadata';
 import { withdrawVestingAddressState } from '../state';
 import { getAddress, waitForSeqno } from '../utils';
 import { useAsyncInitialize } from './useAsyncInitialize';
@@ -16,6 +18,30 @@ export function useWithdrawJetton() {
     withdrawVestingAddressState,
   );
   const [sending, setSending] = useState(false);
+
+  const jettonMasterContract = useAsyncInitialize(async () => {
+    if (!client || !wallet) return;
+    const jettonAdress = getAddress('EQCTPHfgOVEF1Bpv_e79x4HlJ7oEcfxMcOdXLcwaAP3cAqit');
+    if (!jettonAdress) return;
+    const contract = new Jetton(jettonAdress);
+    return client.open(contract) as OpenedContract<Jetton>;
+  }, [client, wallet]);
+
+  const queryJettonMetaData = useQuery({
+    queryKey: ['jetton-master-data', jettonMasterContract],
+    // refetchInterval: 5 * 1000,
+    queryFn: async () => {
+      if (!jettonMasterContract) return null;
+      const data = await jettonMasterContract.getJettonData();
+
+      return {
+        adminAddress: data.adminAddress.toString(),
+        content: await getJettonMetadata(data.content),
+        mintable: data.mintable,
+        totalSupply: fromNano(data.totalSupply),
+      };
+    },
+  });
 
   const linearVestingContract = useAsyncInitialize(async () => {
     if (!client || !withdrawVestingAddress) return;
@@ -39,6 +65,7 @@ export function useWithdrawJetton() {
     linearVestingAddress: linearVestingContract?.address.toString(),
     withdrawVestingAddress,
     setWithdrawVestingAddress,
+    queryJettonMetaData,
     sending,
     withdrawJettons: async () => {
       if (!client || !wallet || !linearVestingContract) {
