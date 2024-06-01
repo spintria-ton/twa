@@ -47,7 +47,6 @@ export const VestingWithdraw = () => {
     withdrawJettons,
     queryJettonMetaData,
   } = useWithdrawJetton();
-  console.log(queryVesting.data);
 
   return (
     <Card
