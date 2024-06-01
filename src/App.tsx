@@ -45,7 +45,7 @@ function App() {
                 slotProps={{
                   badge: { sx: { letterSpacing: -0.6, fontSize: 12 } },
                 }}
-                badgeContent={network ? (network === CHAIN.TESTNET ? 'TESTNET' : '') : 0}
+                badgeContent={network ? (network === CHAIN.TESTNET ? 'TESTNET' : 0) : 0}
               >
                 <TonConnectButton />
               </Badge>
