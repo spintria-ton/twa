@@ -5,6 +5,8 @@ import { START_TIME_OVERHEAD } from './constants';
 import { LinearVestingConfig } from './contracts/LinearVesting';
 import { DurationType, LinearVestingForm } from './types';
 
+export const delay = (ms?: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export const truncateLong = (s: string, l = 20, separator = '...') => {
   if (s.length <= l) return s;
   const sepLen = separator.length,

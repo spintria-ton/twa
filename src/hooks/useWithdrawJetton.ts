@@ -6,7 +6,7 @@ import Jetton from '../contracts/Jetton';
 import { LinearVesting, Opcodes } from '../contracts/LinearVesting';
 import { getJettonMetadata } from '../metadata';
 import { withdrawVestingAddressState } from '../state';
-import { getAddress, waitForSeqno } from '../utils';
+import { delay, getAddress, waitForSeqno } from '../utils';
 import { useAsyncInitialize } from './useAsyncInitialize';
 import { useTonClient } from './useTonClient';
 import { useTonConnect } from './useTonConnect';
@@ -88,7 +88,7 @@ export function useWithdrawJetton() {
         await waiter();
       } catch (error) {}
 
-      // await delay(20 * 1000);
+      await delay(15 * 1000);
       // window.location.reload();
 
       setSending(false);
