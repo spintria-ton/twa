@@ -1,10 +1,13 @@
+import { maskitoTransform } from '@maskito/core';
 import { Address } from '@ton/core';
 import { TonClient } from '@ton/ton';
 import { CHAIN } from '@tonconnect/ui-react';
-import { DEFAULT_DECIMAL_PLACES, START_TIME_OVERHEAD } from './constants';
+import { DEFAULT_DECIMAL_PLACES, START_TIME_OVERHEAD, amountMask } from './constants';
 import { LinearVestingConfig } from './contracts/LinearVesting';
 import Big from './lib/big.js';
 import { DurationType, JettonMetadata, LinearVestingForm } from './types';
+
+const ten = Big(10);
 
 export const delay = (ms?: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -220,8 +223,6 @@ export async function waitForSeqno(client: TonClient, wallet: Address) {
   };
 }
 
-const ten = Big(10);
-
 export function toBig(value: bigint | number, decimals = DEFAULT_DECIMAL_PLACES, noFloor = false) {
   return Big(value.toString())
     .div(ten.pow(decimals))
@@ -231,9 +232,11 @@ export function toBig(value: bigint | number, decimals = DEFAULT_DECIMAL_PLACES,
 export function toDecimal(value: bigint | number, decimals?: number, noFloor = false) {
   return toBig(value, decimals ?? DEFAULT_DECIMAL_PLACES, noFloor).toString();
 }
+
 export const humanizeJettons = (v: bigint, meta?: JettonMetadata) => {
   const decimals = meta?.decimals ? Number(meta?.decimals) : DEFAULT_DECIMAL_PLACES;
-  console.log({ v, meta, decimals });
-
-  return toDecimal(v, decimals);
+  return maskitoTransform(toDecimal(v, decimals), amountMask(2));
 };
+
+// EQAWLFaLIjUf4Gps3KD3sIe9otbDtgXKYa00a17hi5ftL4M2
+export const isValidAddress = (a?: string) => !!a && a.length === 48 && !!getAddress(a);

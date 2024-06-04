@@ -1,238 +1,121 @@
 import { OpenInNew } from '@mui/icons-material';
 import {
-  Alert,
-  Avatar,
-  Badge,
-  Box,
   Button,
-  ButtonGroup,
   Card,
-  CardActions,
   CardContent,
-  CardOverflow,
-  Chip,
   FormControl,
   FormHelperText,
   FormLabel,
-  IconButton,
-  Input,
-  Stack,
+  Link,
   Typography,
 } from '@mui/joy';
-import { Address } from '@ton/core';
-import { CHAIN, TonConnectButton } from '@tonconnect/ui-react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ru'; // import locale
 import duration from 'dayjs/plugin/duration';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { useTonConnect } from '../hooks/useTonConnect';
-import { SPINTRIA_MASTER_ADDRESS, useWithdrawJetton } from '../hooks/useWithdrawJetton';
-import { humanizeJettons } from '../utils';
-import ColorSchemeToggle from './color-scheme-toggle';
+import { useEffect, useState } from 'react';
+import { useRecoilState } from 'recoil';
+import { SPINTRIA_MASTER_ADDRESS } from '../hooks/useWithdrawJetton';
+import { vestingAddressState } from '../state';
+import { isValidAddress } from '../utils';
+import { SpintriaLogo } from './spintria-logo';
+import { StyledInput } from './styled-input';
+import { VestingWalletComponent } from './vesting-wallet-component';
 
 dayjs.locale('ru');
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
 
 export const VestingWithdraw = () => {
-  const { connected, wallet, network } = useTonConnect();
-  const walletAddress = wallet ? Address.parse(wallet).toString() : undefined;
-  const {
-    linearVestingAddress,
-    withdrawVestingAddress,
-    setWithdrawVestingAddress,
-    queryVesting,
-    sending,
-    withdrawJettons,
-    queryJettonMetaData,
-  } = useWithdrawJetton();
+  const [vestingAddress, setVestingAddress] = useRecoilState(vestingAddressState);
+  const [address, setAddress] = useState(vestingAddress);
+  const [saved, setSaved] = useState(!!vestingAddress);
+  const isAddress = isValidAddress(address);
+
+  useEffect(() => {
+    if (saved && address !== vestingAddress) {
+      setVestingAddress(address);
+    }
+  }, [saved]);
 
   return (
     <Card
-      variant="plain"
-      sx={{
-        borderRadius: 0,
-        // maxWidth: '100%',
-        // boxShadow: 'lg',
+      // variant="plain"
+      sx={(theme) => ({
+        width: '100%',
+        [theme.breakpoints.down('md')]: {
+          backgroundColor: 'transparent',
+          border: 'none',
+          borderRadius: 0,
+        },
         display: 'flex',
-        // minHeight: '100vh',
         flexDirection: 'column',
-      }}
+        px: 0,
+        py: 0,
+      })}
     >
-      <CardContent>
-        <Stack
-          width="100%"
-          direction="row"
-          alignItems="center"
-          justifyContent="space-between"
-          spacing={1}
-          sx={{ ml: 'auto' }}
-        >
-          <ColorSchemeToggle />
-          <Badge
-            anchorOrigin={{
-              vertical: 'top',
-              horizontal: 'left',
-            }}
-            variant="solid"
-            size="sm"
-            showZero={false}
-            slotProps={{
-              badge: { sx: { letterSpacing: -0.6, fontSize: 12 } },
-            }}
-            badgeContent={network ? (network === CHAIN.TESTNET ? 'TESTNET' : 0) : 0}
-          >
-            <TonConnectButton />
-          </Badge>
-        </Stack>
-      </CardContent>
-      <CardContent sx={{ alignItems: 'center', textAlign: 'center' }}>
-        <Avatar src="/twa/icon.jpeg" sx={{ '--Avatar-size': '4rem', my: 2 }} />
+      <CardContent sx={{ p: 2, alignItems: 'center', textAlign: 'center' }}>
+        <SpintriaLogo sx={{ width: 64, height: 64, my: 2 }} />
         <Typography level="title-lg">Spintria (SP) Вестинг</Typography>
         <Typography level="body-sm" sx={{ maxWidth: '40ch' }}>
           Для начала работы с кошельком контракта вам необходимо указать адрес вашего
           вестинг-контракта
         </Typography>
-
-        <Box sx={{ display: 'grid', gap: 2, py: 2, width: '100%', textAlign: 'left' }}>
-          <FormControl>
-            <FormLabel>Укажите адрес вашего вестинг контракта</FormLabel>
-            <Input
-              size="lg"
-              type="text"
-              placeholder="укажите адрес вестинг контракта"
-              value={withdrawVestingAddress?.toString() || ''}
-              onChange={(e) => setWithdrawVestingAddress(e.target.value)}
-            />
-            <FormHelperText sx={{ color: (t) => t.vars.palette.danger.plainColor }}>
-              Не переводите на этот адрес тоны или жетоны, кроме SP{' '}
-              <IconButton
-                onClick={() =>
-                  window.open(`https://tonviewer.com/${SPINTRIA_MASTER_ADDRESS}`, '_blank')
-                }
-                size="sm"
-                color="primary"
-                sx={{ '--IconButton-size': '24px' }}
-              >
-                <OpenInNew />
-              </IconButton>
-            </FormHelperText>
-          </FormControl>
-        </Box>
       </CardContent>
-      <CardContent sx={{}}>
-        <Typography level="body-xs">Начало вестинга</Typography>
-        <Typography
-          level="title-lg"
-          sx={{ fontWeight: 'xl' }}
-          endDecorator={
-            queryVesting.data && (
-              <Chip component="span" size="sm" variant="outlined" color="neutral">
-                {dayjs(queryVesting.data?.startTime * 1000).fromNow()}
-              </Chip>
+      <CardContent sx={{ pt: 2 }}>
+        <FormControl error={!isAddress}>
+          <FormLabel sx={{ px: 2 }}>Адрес вестинг-контракта</FormLabel>
+          <StyledInput
+            size="lg"
+            type="text"
+            // disabled={saved}
+            placeholder="..."
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            slotProps={{ input: { disabled: saved } }}
+            endDecorator={
+              saved && (
+                <Button size="sm" variant="plain" onClick={() => setSaved(false)}>
+                  изменить
+                </Button>
+              )
+            }
+          />
+          {isAddress ? (
+            saved && (
+              <FormHelperText sx={{ px: 2, color: (t) => t.vars.palette.danger.plainColor }}>
+                Не переводите на этот адрес тоны или жетоны, кроме
+                <Link
+                  fontSize="inherit"
+                  underline="none"
+                  endDecorator={<OpenInNew sx={{ fontSize: 'inherit' }} />}
+                  href={`https://tonviewer.com/${SPINTRIA_MASTER_ADDRESS}`}
+                  target="_blank"
+                >
+                  SP
+                </Link>
+              </FormHelperText>
             )
-          }
-        >
-          {queryVesting.data
-            ? dayjs(queryVesting.data?.startTime * 1000).format('DD/MM/YYYY')
-            : '...'}
-        </Typography>
-        {/*  */}
-        <Typography level="body-xs" sx={{ mt: 1 }}>
-          Продолжительность
-        </Typography>
-        <Typography level="title-lg" sx={{ fontWeight: 'xl' }}>
-          {queryVesting.data
-            ? dayjs.duration(queryVesting.data?.totalDuration, 'second').humanize()
-            : '...'}
-        </Typography>
-        {/*  */}
-        <Typography level="body-xs" sx={{ mt: 1 }}>
-          Период блокировки
-        </Typography>
-        <Typography level="title-lg" sx={{ fontWeight: 'xl' }}>
-          {queryVesting.data
-            ? dayjs.duration(queryVesting.data?.unlockPeriod, 'second').humanize()
-            : '...'}
-        </Typography>
-        {/*  */}
-        <Typography level="body-xs" sx={{ mt: 1 }}>
-          Холодный период (клифф)
-        </Typography>
-        <Typography level="title-lg" sx={{ fontWeight: 'xl' }}>
-          {queryVesting.data
-            ? queryVesting.data?.cliffDuration > 0
-              ? dayjs.duration(queryVesting.data?.cliffDuration, 'second').humanize()
-              : 'отключен'
-            : '...'}
-        </Typography>
-        {/*  */}
-        <Typography level="body-xs" sx={{ mt: 1 }}>
-          Всего получено
-        </Typography>
-        <Typography level="title-lg" sx={{ fontWeight: 'xl' }}>
-          {queryVesting.data
-            ? humanizeJettons(
-                queryVesting.data.totalDeposited || 0n,
-                queryJettonMetaData.data?.content,
-              )
-            : '...'}
-          &nbsp;&nbsp;
-          <Typography color="neutral" level="title-sm">
-            {queryJettonMetaData.data && queryJettonMetaData.data.content?.symbol}
-          </Typography>
-        </Typography>
-        {/*  */}
-        <Typography level="body-xs" sx={{ mt: 1 }}>
-          Всего выведено
-        </Typography>
-        <Typography level="title-lg" sx={{ fontWeight: 'xl' }}>
-          {queryVesting.data
-            ? humanizeJettons(
-                queryVesting.data.totalWithdrawals || 0n,
-                queryJettonMetaData.data?.content,
-              )
-            : '...'}
-          &nbsp;&nbsp;
-          <Typography color="neutral" level="title-sm">
-            {queryJettonMetaData.data && queryJettonMetaData.data.content?.symbol}
-          </Typography>
-        </Typography>
-        {!connected && (
-          <Alert sx={{ mt: 2 }} color="danger">
-            Подключите кошелек для работы с контрактом
-          </Alert>
-        )}
-        {queryVesting.data && walletAddress !== queryVesting.data.ownerAddress.toString() && (
-          <Alert color="danger" sx={{ mt: 1, py: 1 }}>
-            Вы не можете вывести жетоны на свой кошелек так как не являетесь правообладателем
-          </Alert>
-        )}
+          ) : (
+            <FormHelperText sx={{ px: 2 }}>Некорректный адрес</FormHelperText>
+          )}
+        </FormControl>
       </CardContent>
-      <CardOverflow sx={{ bgcolor: 'background.level1' }}>
-        <CardActions buttonFlex="1">
-          <ButtonGroup variant="solid" sx={{ bgcolor: 'background.surface' }}>
-            <Button
-              color="primary"
-              type="submit"
-              loading={sending}
-              size="lg"
-              disabled={
-                queryVesting.isFetching ||
-                !queryVesting.data ||
-                walletAddress !== queryVesting.data.ownerAddress.toString() ||
-                !connected ||
-                !withdrawVestingAddress ||
-                !linearVestingAddress ||
-                sending
-              }
-              onClick={withdrawJettons}
-            >
-              Вывод жетонов на кошелек
-            </Button>
-          </ButtonGroup>
-        </CardActions>
-      </CardOverflow>
+      {!saved && (
+        <CardContent sx={{ p: 2 }}>
+          <Button
+            disabled={!isAddress}
+            variant="solid"
+            color="primary"
+            type="submit"
+            size="lg"
+            onClick={() => setSaved(!saved)}
+          >
+            Сохранить
+          </Button>
+        </CardContent>
+      )}
+      <VestingWalletComponent />
     </Card>
   );
 };

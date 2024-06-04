@@ -6,6 +6,7 @@
   "homepage": "https://spintria-ton.github.io/twa",
   "scripts": {
     "dev": "vite",
+    "devh": "vite --host",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "configbot": "node configure.js",

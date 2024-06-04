@@ -96,7 +96,6 @@ export class LinearVesting implements Contract {
       totalDeposited: result.stack.readBigNumber(),
       totalWithdrawals: result.stack.readBigNumber(),
       ownerAddress: result.stack.readAddress(),
-      // jettonWallet: result.stack.readAddress(),
     };
   }
 

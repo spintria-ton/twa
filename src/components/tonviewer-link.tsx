@@ -1,7 +1,7 @@
 import { OpenInNew } from '@mui/icons-material';
 import { IconButton } from '@mui/joy';
-import { truncateLong } from '../../utils';
-import { CopyToClipboard } from '../copy-to-clipboard';
+import { truncateLong } from '../utils';
+import { CopyToClipboard } from './copy-to-clipboard';
 
 type Props = {
   address: string;

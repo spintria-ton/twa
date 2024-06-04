@@ -36,3 +36,13 @@ export interface JettonMetadata {
   image_data?: string;
   uri?: string;
 }
+
+export type VestingData = {
+  startTime: number;
+  totalDuration: number;
+  unlockPeriod: number;
+  cliffDuration: number;
+  totalDeposited: bigint;
+  totalWithdrawals: bigint;
+  ownerAddress: string;
+};
