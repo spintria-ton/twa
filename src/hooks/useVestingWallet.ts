@@ -125,7 +125,6 @@ export function useVestingWallet() {
           value: toNano('0.1'),
           body: beginCell().storeUint(Opcodes.withdraw, 32).storeUint(0, 64).endCell(),
         });
-        console.log('sendTxResponse', sendTxResponse);
 
         const txDone = await waitForTransaction(
           client,

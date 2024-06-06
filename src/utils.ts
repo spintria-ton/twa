@@ -217,7 +217,6 @@ export async function waitForSeqno(client: TonClient, wallet: Address) {
     for (let attempt = 0; attempt < 15; attempt++) {
       await sleep(3000);
       const seqnoAfter = await getSeqNo(client, wallet);
-      console.log({ seqnoBefore, seqnoAfter });
 
       if (seqnoAfter > seqnoBefore) return;
     }
