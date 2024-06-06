@@ -1,6 +1,7 @@
 import { Box } from '@mui/joy';
 import { useTonWallet } from '@tonconnect/ui-react';
 import { VestingWithdraw } from './vesting-withdraw';
+import { WelcomeComponent } from './welcome-component';
 
 export const WithdrawWrapperComponent = () => {
   const wallet = useTonWallet();
@@ -9,8 +10,7 @@ export const WithdrawWrapperComponent = () => {
   return (
     <Box sx={{ flex: 1, width: '100%' }}>
       <Box display="flex" maxWidth="800px" mx="auto" py={{ xs: 0, md: 3 }} px={{ xs: 0, md: 6 }}>
-        {/* {connected ? <VestingWithdraw /> : <WelcomeComponent />} */}
-        <VestingWithdraw />
+        {connected ? <VestingWithdraw /> : <WelcomeComponent />}
       </Box>
     </Box>
   );
