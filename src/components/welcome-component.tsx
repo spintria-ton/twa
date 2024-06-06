@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/ru'; // import locale
 import duration from 'dayjs/plugin/duration';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { SPINTRIA_MASTER_ADDRESS } from '../hooks/useWithdrawJetton';
+import { SPINTRIA_MASTER_ADDRESS } from '../constants';
 import { SpintriaLogo } from './spintria-logo';
 
 dayjs.locale('ru');
