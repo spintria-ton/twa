@@ -17,3 +17,4 @@ export const amountMask = (decimals: number) =>
     // postfix: '',
   });
 export const START_TIME_FORMAT = 'DD MMM YYYY';
+export const SPINTRIA_MASTER_ADDRESS = 'EQACLXDwit01stiqK9FvYiJo15luVzfD5zU8uwDSq6JXxbP8';

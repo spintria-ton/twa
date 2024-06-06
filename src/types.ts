@@ -46,3 +46,7 @@ export type VestingData = {
   totalWithdrawals: bigint;
   ownerAddress: string;
 };
+
+export interface CancellablePromise<T> extends Promise<T> {
+  cancel: () => void;
+}

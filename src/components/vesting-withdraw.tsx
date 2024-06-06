@@ -15,7 +15,8 @@ import duration from 'dayjs/plugin/duration';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
-import { SPINTRIA_MASTER_ADDRESS } from '../hooks/useWithdrawJetton';
+
+import { SPINTRIA_MASTER_ADDRESS } from '../constants';
 import { vestingAddressState } from '../state';
 import { isValidAddress } from '../utils';
 import { SpintriaLogo } from './spintria-logo';

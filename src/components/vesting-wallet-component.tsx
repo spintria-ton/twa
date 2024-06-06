@@ -8,6 +8,8 @@ import {
   Divider,
   FormControl,
   FormHelperText,
+  Modal,
+  ModalDialog,
   Skeleton,
   Stack,
   Typography,
@@ -19,13 +21,21 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import { useMemo } from 'react';
 import { START_TIME_FORMAT } from '../constants';
 import { useVestingWallet } from '../hooks/useVestingWallet';
+import { StyledCircularProgress } from './circular-progress';
 
 dayjs.locale('ru');
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
 
 export const VestingWalletComponent = () => {
-  const { isVestingOwner, vesting, friendlyVesting, withdrawJettons } = useVestingWallet();
+  const {
+    isVestingOwner,
+    vesting,
+    friendlyVesting,
+    withdrawJettons,
+    sendingTxs,
+    connectionRestored,
+  } = useVestingWallet();
 
   const amountsComponent = useMemo(
     () => (
@@ -54,144 +64,161 @@ export const VestingWalletComponent = () => {
   );
 
   return (
-    <Card
-      variant="soft"
-      color="primary"
-      invertedColors
-      sx={{
-        width: '100%',
-        borderRadius: 0,
-        border: 'none',
-      }}
-    >
-      <CardContent orientation="horizontal">
-        <Stack direction="column" alignItems="center" justifyContent="start" spacing={2}>
-          <CircularProgress size="lg" determinate value={friendlyVesting?.currentPercent || 0}>
-            {friendlyVesting ? (
-              friendlyVesting.currentPercent < 100 ? (
-                <Typography>{friendlyVesting.currentPercent}%</Typography>
+    <>
+      <Card
+        variant="soft"
+        color="primary"
+        invertedColors
+        sx={{
+          width: '100%',
+          borderRadius: 0,
+          border: 'none',
+        }}
+      >
+        <CardContent orientation="horizontal">
+          <Stack direction="column" alignItems="center" justifyContent="start" spacing={2}>
+            <CircularProgress size="lg" determinate value={friendlyVesting?.currentPercent || 0}>
+              {friendlyVesting ? (
+                friendlyVesting.currentPercent < 100 ? (
+                  <Typography>{friendlyVesting.currentPercent}%</Typography>
+                ) : (
+                  <Check />
+                )
               ) : (
-                <Check />
-              )
-            ) : (
-              <Skeleton animation="wave" sx={{ opacity: 0.2 }} variant="circular">
-                100
-              </Skeleton>
-            )}
-          </CircularProgress>
-          {friendlyVesting && !friendlyVesting.isFinished
-            ? `${friendlyVesting.currentPeriod} / ${friendlyVesting.periods}`
-            : ''}
-        </Stack>
-        <CardContent>
-          <Typography level="body-md">Начало вестинг периода</Typography>
-          <Typography level="h2">
-            {vesting ? (
-              dayjs(vesting.data.startTime * 1000).format(START_TIME_FORMAT)
-            ) : (
-              <Skeleton animation="wave" sx={{ opacity: 0.2 }} variant="rectangular">
-                {START_TIME_FORMAT}
-              </Skeleton>
-            )}
-          </Typography>
-          {/*  */}
-          <Typography level="body-xs" sx={{ mt: 1 }}>
-            Продолжительность
-          </Typography>
-          <Typography level="title-lg" sx={{ fontWeight: 'xl' }}>
-            {vesting ? (
-              dayjs.duration(vesting.data.totalDuration, 'second').humanize()
-            ) : (
-              <Skeleton animation="wave" sx={{ opacity: 0.2 }} variant="rectangular">
-                {START_TIME_FORMAT}
-              </Skeleton>
-            )}
-          </Typography>
-          {/*  */}
-          <Typography level="body-xs" sx={{ mt: 1 }}>
-            Период блокировки
-          </Typography>
-          <Typography level="title-lg" sx={{ fontWeight: 'xl' }}>
-            {vesting ? (
-              dayjs.duration(vesting.data.unlockPeriod, 'second').humanize()
-            ) : (
-              <Skeleton animation="wave" sx={{ opacity: 0.2 }} variant="rectangular">
-                {START_TIME_FORMAT}
-              </Skeleton>
-            )}
-          </Typography>
-          {/*  */}
-          <Typography level="body-xs" sx={{ mt: 1 }}>
-            Холодный период (клифф)
-          </Typography>
-          <Typography level="title-lg" sx={{ fontWeight: 'xl' }}>
-            {vesting ? (
-              vesting.data.cliffDuration > 0 ? (
-                dayjs.duration(vesting.data.cliffDuration, 'second').humanize()
+                <Skeleton animation="wave" sx={{ opacity: 0.2 }} variant="circular">
+                  100
+                </Skeleton>
+              )}
+            </CircularProgress>
+            {friendlyVesting && !friendlyVesting.isFinished
+              ? `${friendlyVesting.currentPeriod} / ${friendlyVesting.periods}`
+              : ''}
+          </Stack>
+          <CardContent>
+            <Typography level="body-md">Начало вестинг периода</Typography>
+            <Typography level="h2">
+              {vesting ? (
+                dayjs(vesting.data.startTime * 1000).format(START_TIME_FORMAT)
               ) : (
-                'отключен'
-              )
-            ) : (
-              <Skeleton animation="wave" sx={{ opacity: 0.2 }} variant="rectangular">
-                {START_TIME_FORMAT}
-              </Skeleton>
-            )}
-          </Typography>
-          {/*  */}
-          <Typography level="body-xs" sx={{ mt: 1 }}>
-            Следующий период
-          </Typography>
-          <Typography level="title-lg" sx={{ fontWeight: 'xl' }}>
-            {vesting && friendlyVesting ? (
-              friendlyVesting.isFinished ? (
-                'контракт завершен'
+                <Skeleton animation="wave" sx={{ opacity: 0.2 }} variant="rectangular">
+                  {START_TIME_FORMAT}
+                </Skeleton>
+              )}
+            </Typography>
+            {/*  */}
+            <Typography level="body-xs" sx={{ mt: 1 }}>
+              Продолжительность
+            </Typography>
+            <Typography level="title-lg" sx={{ fontWeight: 'xl' }}>
+              {vesting ? (
+                dayjs.duration(vesting.data.totalDuration, 'second').humanize()
               ) : (
-                dayjs(friendlyVesting.nextPeriod * 1000).format(START_TIME_FORMAT)
-              )
-            ) : (
-              <Skeleton animation="wave" sx={{ opacity: 0.2 }} variant="rectangular">
-                {START_TIME_FORMAT}
-              </Skeleton>
-            )}
-          </Typography>
-          {amountsComponent}
+                <Skeleton animation="wave" sx={{ opacity: 0.2 }} variant="rectangular">
+                  {START_TIME_FORMAT}
+                </Skeleton>
+              )}
+            </Typography>
+            {/*  */}
+            <Typography level="body-xs" sx={{ mt: 1 }}>
+              Период блокировки
+            </Typography>
+            <Typography level="title-lg" sx={{ fontWeight: 'xl' }}>
+              {vesting ? (
+                dayjs.duration(vesting.data.unlockPeriod, 'second').humanize()
+              ) : (
+                <Skeleton animation="wave" sx={{ opacity: 0.2 }} variant="rectangular">
+                  {START_TIME_FORMAT}
+                </Skeleton>
+              )}
+            </Typography>
+            {/*  */}
+            <Typography level="body-xs" sx={{ mt: 1 }}>
+              Холодный период (клифф)
+            </Typography>
+            <Typography level="title-lg" sx={{ fontWeight: 'xl' }}>
+              {vesting ? (
+                vesting.data.cliffDuration > 0 ? (
+                  dayjs.duration(vesting.data.cliffDuration, 'second').humanize()
+                ) : (
+                  'отключен'
+                )
+              ) : (
+                <Skeleton animation="wave" sx={{ opacity: 0.2 }} variant="rectangular">
+                  {START_TIME_FORMAT}
+                </Skeleton>
+              )}
+            </Typography>
+            {/*  */}
+            <Typography level="body-xs" sx={{ mt: 1 }}>
+              Следующий период
+            </Typography>
+            <Typography level="title-lg" sx={{ fontWeight: 'xl' }}>
+              {vesting && friendlyVesting ? (
+                friendlyVesting.isFinished ? (
+                  'контракт завершен'
+                ) : (
+                  dayjs(friendlyVesting.nextPeriod * 1000).format(START_TIME_FORMAT)
+                )
+              ) : (
+                <Skeleton animation="wave" sx={{ opacity: 0.2 }} variant="rectangular">
+                  {START_TIME_FORMAT}
+                </Skeleton>
+              )}
+            </Typography>
+            {amountsComponent}
+          </CardContent>
         </CardContent>
-      </CardContent>
-      <Divider />
-      <CardActions>
-        <FormControl sx={{ width: '100%' }}>
-          <FormHelperText
-            sx={{
-              p: 0,
-              color: (t) =>
-                isVestingOwner ? t.vars.palette.neutral : t.vars.palette.danger.plainColor,
-            }}
-          >
-            {vesting
-              ? isVestingOwner
-                ? null
-                : `Вы не можете вывести жетоны на свой кошелек, так как не являетесь владельцем
+        <Divider />
+        <CardActions>
+          <FormControl sx={{ width: '100%' }}>
+            <FormHelperText
+              sx={{
+                p: 0,
+                color: (t) =>
+                  isVestingOwner ? t.vars.palette.neutral : t.vars.palette.danger.plainColor,
+              }}
+            >
+              {vesting
+                ? isVestingOwner
+                  ? null
+                  : `Вы не можете вывести жетоны на свой кошелек, так как не являетесь владельцем
                 вестинг-контракта`
-              : null}
-          </FormHelperText>
-          <Button
-            disabled={
-              !isVestingOwner ||
-              !vesting ||
-              !friendlyVesting ||
-              friendlyVesting.isFinished ||
-              friendlyVesting?.toWithdraw === 0n ||
-              friendlyVesting?.totalLocked === 0n
-            }
-            variant="solid"
-            size="lg"
-            sx={{ borderRadius: 6 }}
-            onClick={withdrawJettons}
-          >
-            Вывод на кошелек
-          </Button>
-        </FormControl>
-      </CardActions>
-    </Card>
+                : null}
+            </FormHelperText>
+            <Button
+              loading={sendingTxs}
+              disabled={
+                !isVestingOwner ||
+                !vesting ||
+                !friendlyVesting ||
+                friendlyVesting.isFinished ||
+                friendlyVesting?.toWithdraw === 0n ||
+                friendlyVesting?.totalLocked === 0n
+              }
+              variant="solid"
+              size="lg"
+              sx={{ borderRadius: 6 }}
+              onClick={withdrawJettons}
+            >
+              Вывод на кошелек
+            </Button>
+          </FormControl>
+        </CardActions>
+      </Card>
+      <Modal open={!connectionRestored}>
+        <ModalDialog
+          variant="plain"
+          sx={{
+            backgroundColor: 'transparent',
+            boxShadow: 'unset',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <StyledCircularProgress variant="plain" sx={{ color: 'transparent' }} />
+        </ModalDialog>
+      </Modal>
+    </>
   );
 };

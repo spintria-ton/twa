@@ -214,14 +214,39 @@ export async function waitForSeqno(client: TonClient, wallet: Address) {
   const seqnoBefore = await getSeqNo(client, wallet);
 
   return async () => {
-    for (let attempt = 0; attempt < 25; attempt++) {
+    for (let attempt = 0; attempt < 15; attempt++) {
       await sleep(3000);
       const seqnoAfter = await getSeqNo(client, wallet);
+      console.log({ seqnoBefore, seqnoAfter });
+
       if (seqnoAfter > seqnoBefore) return;
     }
     throw new Error('Timeout');
   };
 }
+
+export const waitForTransaction = async (
+  client: TonClient,
+  address: Address,
+  curTx: string | null,
+  // 60 * 2 / 40 = 3 sec (equals two minutes)
+  maxRetries = 40,
+  interval = 3 * 1000,
+) => {
+  let done = false;
+  let count = 0;
+
+  do {
+    // ui.write(`Awaiting transaction completion (${++count}/${maxRetry})`);
+    await sleep(interval);
+    const curState = await client.getContractState(address);
+    if (curState.lastTransaction !== null) {
+      done = curState.lastTransaction.lt !== curTx;
+    }
+  } while (!done && count < maxRetries);
+
+  return done;
+};
 
 export function toBig(value: bigint | number, decimals = DEFAULT_DECIMAL_PLACES, noFloor = false) {
   return Big(value.toString())

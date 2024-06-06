@@ -19,7 +19,7 @@ export function useTonConnect(): {
         if (args.init) {
           stateCell = beginCell().store(storeStateInit(args.init)).endCell();
         }
-        tonConnectUI.sendTransaction({
+        return tonConnectUI.sendTransaction({
           messages: [
             {
               address: args.to.toString(),
@@ -29,7 +29,7 @@ export function useTonConnect(): {
             },
           ],
           validUntil: Date.now() + 5 * 60 * 1000, // 5 minutes for user to approve
-        });
+        }) as unknown as Promise<void>;
       },
     },
     connected: !!wallet?.account.address,

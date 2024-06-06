@@ -22,7 +22,7 @@ export const Header = () => {
         top: 0,
         width: '100vw',
         height: 'var(--Header-height)',
-        zIndex: 9998,
+        zIndex: 998,
         gap: 1,
         backgroundColor: 'transparent',
       }}
